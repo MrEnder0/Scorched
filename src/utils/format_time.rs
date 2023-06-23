@@ -3,6 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 pub enum TimeFormat {
     Ymdhms,
     Ymd,
+    //Currently unused
     HMS,
 }
 
