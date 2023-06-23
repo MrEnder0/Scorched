@@ -18,10 +18,15 @@ pub struct LogData {
 pub fn log_this(data: LogData) {
     let formatted_time = utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymdhms);
 
+    //Creates logs folder if it doesn't exist
+    if !std::path::Path::new("logs").exists() {
+        std::fs::create_dir("logs").unwrap();
+    }
+
     let file = OpenOptions::new()
         .append(true)
         .create(true)
-        .open(format!("{}.log", utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymd)));
+        .open(format!("logs/{}.log", utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymd)));
 
     match data.importance {
         LogImportance::Error => {
@@ -57,6 +62,7 @@ pub fn log_this(data: LogData) {
                 data.message
             );
         }
+        //Mainly unused, but still here
         LogImportance::Debug => {
             file.unwrap()
                 .write_all(format!("{} [DEBUG] {}\n", formatted_time, data.message).as_bytes())
