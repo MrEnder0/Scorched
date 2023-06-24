@@ -1,7 +1,7 @@
 mod utils;
 
-use std::{fmt::Debug, fs::OpenOptions, io::prelude::*};
 use owo_colors::{colors::css::*, OwoColorize};
+use std::{fmt::Debug, fs::OpenOptions, io::prelude::*};
 
 pub enum LogImportance {
     Error,
@@ -16,17 +16,18 @@ pub struct LogData {
 }
 
 pub fn log_this(data: LogData) {
-    let formatted_time = utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymdhms);
+    let formatted_time =
+        utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymdhms);
 
     //Creates logs folder if it doesn't exist
     if !std::path::Path::new("logs").exists() {
         std::fs::create_dir("logs").unwrap();
     }
 
-    let file = OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(format!("logs/{}.log", utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymd)));
+    let file = OpenOptions::new().append(true).create(true).open(format!(
+        "logs/{}.log",
+        utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymd)
+    ));
 
     match data.importance {
         LogImportance::Error => {
