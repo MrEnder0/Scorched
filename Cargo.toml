@@ -7,4 +7,3 @@ license = "Apache-2.0"
 
 [dependencies]
 owo-colors = "3.5.0"
-chrono = "0.4.26"
