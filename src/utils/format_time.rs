@@ -16,12 +16,12 @@ pub fn get_formatted_time(format: TimeFormat) -> String {
         TimeFormat::Ymdhms => {
             let formatted_time = format!(
                 //Y-m-d H:M:S
-                "{}-{}-{} {}:{}:{}",
+                "{}-{}-{} {}:{}.{}",
                 seconds_since_epoch / 31536000 + 1970,
-                seconds_since_epoch / 2592000 % 12 + 1,
-                seconds_since_epoch / 86400 % 30 + 1,
-                seconds_since_epoch / 3600 % 24,
-                seconds_since_epoch / 60 % 60,
+                (seconds_since_epoch % 31556926) / 2629743 + 1,
+                (seconds_since_epoch % 2629743) / 86400 + 1,
+                (seconds_since_epoch % 86400) / 3600 + 0,
+                (seconds_since_epoch % 3600) / 60,
                 seconds_since_epoch % 60
             );
             return formatted_time;
@@ -31,8 +31,8 @@ pub fn get_formatted_time(format: TimeFormat) -> String {
                 //Y-m-d
                 "{}-{}-{}",
                 seconds_since_epoch / 31536000 + 1970,
-                seconds_since_epoch / 2592000 % 12 + 1,
-                seconds_since_epoch / 86400 % 30 + 1
+                (seconds_since_epoch % 31556926) / 2629743 + 1,
+                (seconds_since_epoch % 2629743) / 86400 + 1,
             );
             return formatted_time;
         }
@@ -40,8 +40,8 @@ pub fn get_formatted_time(format: TimeFormat) -> String {
             let formatted_time = format!(
                 //H:M:S
                 "{}:{}:{}",
-                seconds_since_epoch / 3600 % 24,
-                seconds_since_epoch / 60 % 60,
+                (seconds_since_epoch % 86400) / 3600 + 0,
+                (seconds_since_epoch % 3600) / 60,
                 seconds_since_epoch % 60
             );
             return formatted_time;
