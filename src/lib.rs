@@ -15,7 +15,7 @@ pub struct LogData {
     pub message: String,
 }
 
-pub fn log_this(data: LogData) {
+pub async fn log_this(data: LogData) {
     let formatted_time =
         utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymdhms);
 
