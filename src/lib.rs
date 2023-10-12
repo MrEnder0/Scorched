@@ -15,18 +15,19 @@ pub struct LogData {
     pub message: String,
 }
 
-pub async fn log_this(data: LogData) {
-    let formatted_time =
-        utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymdhms);
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-    //Creates logs folder if it doesn't exist
+pub async fn log_this(data: LogData) {
+    let formatted_time = utils::time_utils::get_formatted_time();
+
+    // Creates logs folder if it doesn't exist
     if !std::path::Path::new("logs").exists() {
         std::fs::create_dir("logs").unwrap();
     }
 
     let file = OpenOptions::new().append(true).create(true).open(format!(
         "logs/{}.log",
-        utils::format_time::get_formatted_time(utils::format_time::TimeFormat::Ymd)
+        utils::time_utils::get_formatted_time()
     ));
 
     match data.importance {
@@ -63,7 +64,7 @@ pub async fn log_this(data: LogData) {
                 data.message
             );
         }
-        //Mainly unused, but still here
+        // Mainly unused, but still available
         LogImportance::Debug => {
             file.unwrap()
                 .write_all(format!("{} [DEBUG] {}\n", formatted_time, data.message).as_bytes())
@@ -71,7 +72,7 @@ pub async fn log_this(data: LogData) {
             println!(
                 "{} {} {}",
                 formatted_time,
-                "[DEBUG]".fg::<Black>().bg::<LightBlue>(),
+                "[DEBUG]".fg::<Black>().bg::<Magenta>(),
                 data.message
             );
         }
@@ -91,6 +92,7 @@ impl<T, E: Debug> LogExpect<T, E> for Result<T, E> {
                     importance,
                     message: format!("{}: {:?}", msg, err),
                 });
+
                 panic!("{}: {:?}", msg, err);
             }
         }
@@ -106,8 +108,20 @@ impl<T> LogExpect<T, ()> for Option<T> {
                     importance,
                     message: msg.to_string(),
                 });
+
                 panic!("{}", msg);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn set_logging() {
+        crate::log_this(crate::LogData {
+            importance: crate::LogImportance::Info,
+            message: "Test".to_string(),
+        });
     }
 }
