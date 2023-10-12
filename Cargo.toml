@@ -1,10 +1,10 @@
 [package]
 name = "scorched"
 description = "A simple logging library for scorching all those pesky bugs."
-version = "0.2.4"
+version = "0.2.6"
 edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
 owo-colors = "3.5.0"
-chrono = "0.4.26"
+chrono = "0.4.31"
