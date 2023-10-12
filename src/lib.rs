@@ -27,7 +27,7 @@ pub async fn log_this(data: LogData) {
 
     let file = OpenOptions::new().append(true).create(true).open(format!(
         "logs/{}.log",
-        utils::time_utils::get_formatted_time()
+        utils::time_utils::get_formatted_time().split('T').collect::<Vec<&str>>()[0]
     ));
 
     match data.importance {
