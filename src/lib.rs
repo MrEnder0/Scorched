@@ -15,7 +15,7 @@ pub struct LogData {
     pub message: String,
 }
 
-const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub async fn log_this(data: LogData) {
     let formatted_time = utils::time_utils::get_formatted_time();
