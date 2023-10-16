@@ -18,8 +18,6 @@ pub struct LogData {
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub async fn log_this(data: LogData) {
-    let formatted_time = utils::time_utils::get_formatted_time();
-
     // Creates logs folder if it doesn't exist
     if !std::path::Path::new("logs").exists() {
         std::fs::create_dir("logs").unwrap();
@@ -27,39 +25,66 @@ pub async fn log_this(data: LogData) {
 
     let file = OpenOptions::new().append(true).create(true).open(format!(
         "logs/{}.log",
-        utils::time_utils::get_formatted_time().split('T').collect::<Vec<&str>>()[0]
+        utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Date)
     ));
 
     match data.importance {
         LogImportance::Error => {
             file.unwrap()
-                .write_all(format!("{} [ERROR] {}\n", formatted_time, data.message).as_bytes())
+                .write_all(
+                    format!(
+                        "{} [ERROR] {}\n",
+                        utils::time_utils::get_formatted_time(
+                            utils::time_utils::TimeFormat::DateTime
+                        ),
+                        data.message
+                    )
+                    .as_bytes(),
+                )
                 .unwrap();
             println!(
                 "{} {} {}",
-                formatted_time,
+                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
                 "[ERROR]".fg::<Black>().bg::<Red>(),
                 data.message
             );
         }
         LogImportance::Warning => {
             file.unwrap()
-                .write_all(format!("{} [WARNING] {}\n", formatted_time, data.message).as_bytes())
+                .write_all(
+                    format!(
+                        "{} [WARNING] {}\n",
+                        utils::time_utils::get_formatted_time(
+                            utils::time_utils::TimeFormat::DateTime
+                        ),
+                        data.message
+                    )
+                    .as_bytes(),
+                )
                 .unwrap();
             println!(
                 "{} {} {}",
-                formatted_time,
+                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
                 "[WARNING]".fg::<Black>().bg::<Yellow>(),
                 data.message
             );
         }
         LogImportance::Info => {
             file.unwrap()
-                .write_all(format!("{} [INFO] {}\n", formatted_time, data.message).as_bytes())
+                .write_all(
+                    format!(
+                        "{} [INFO] {}\n",
+                        utils::time_utils::get_formatted_time(
+                            utils::time_utils::TimeFormat::DateTime
+                        ),
+                        data.message
+                    )
+                    .as_bytes(),
+                )
                 .unwrap();
             println!(
                 "{} {} {}",
-                formatted_time,
+                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
                 "[INFO]".fg::<Black>().bg::<LightGray>(),
                 data.message
             );
@@ -67,11 +92,20 @@ pub async fn log_this(data: LogData) {
         // Mainly unused, but still available
         LogImportance::Debug => {
             file.unwrap()
-                .write_all(format!("{} [DEBUG] {}\n", formatted_time, data.message).as_bytes())
+                .write_all(
+                    format!(
+                        "{} [DEBUG] {}\n",
+                        utils::time_utils::get_formatted_time(
+                            utils::time_utils::TimeFormat::DateTime
+                        ),
+                        data.message
+                    )
+                    .as_bytes(),
+                )
                 .unwrap();
             println!(
                 "{} {} {}",
-                formatted_time,
+                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
                 "[DEBUG]".fg::<Black>().bg::<Magenta>(),
                 data.message
             );
