@@ -17,7 +17,7 @@ pub fn get_formatted_time(time_format: TimeFormat) -> String {
         .with_timezone(&Utc)
         .to_rfc3339();
 
-    //Make use of time format and split str
+    // Splits the time into the needed format
     match time_format {
         TimeFormat::DateTime => time,
         TimeFormat::Date => time.split('T').collect::<Vec<&str>>()[0].to_string(),
