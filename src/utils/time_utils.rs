@@ -19,8 +19,8 @@ pub fn get_formatted_time(time_format: TimeFormat) -> String {
 
     // Splits the time into the needed format
     match time_format {
-        TimeFormat::DateTime => time,
-        TimeFormat::Date => time.split('T').collect::<Vec<&str>>()[0].to_string(),
-        TimeFormat::Time => time.split('T').collect::<Vec<&str>>()[1].to_string(),
+        TimeFormat::DateTime => time.split('+').collect::<Vec<&str>>()[0].to_string().replace('T', " "),
+        TimeFormat::Date => time.split('+').collect::<Vec<&str>>()[0].to_string().split('T').collect::<Vec<&str>>()[0].to_string(),
+        TimeFormat::Time => time.split('T').collect::<Vec<&str>>()[1].to_string().split('+').collect::<Vec<&str>>()[0].to_string(),
     }
 }
