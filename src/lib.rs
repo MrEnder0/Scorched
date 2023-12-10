@@ -32,8 +32,8 @@ pub fn set_logging_path(path: &str) {
 /// Logs the given data to the console with the error type and then to a file
 pub fn log_this(data: LogData) {
     // Creates logs folder if it doesn't exist
-    if !std::path::Path::new("logs").exists() {
-        std::fs::create_dir("logs").unwrap();
+    if !std::path::Path::new(env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()).as_str()).exists() {
+        std::fs::create_dir_all(env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string())).log_expect(LogImportance::Error, "Failed to create logs folder");
     }
 
     let file = OpenOptions::new().append(true).create(true).open(format!(
