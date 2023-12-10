@@ -1,7 +1,7 @@
 mod utils;
 
 use owo_colors::{colors::css::*, OwoColorize};
-use std::{fmt::Debug, fs::OpenOptions, io::prelude::*};
+use std::{env, fmt::Debug, fs::OpenOptions, io::prelude::*};
 
 pub enum LogImportance {
     Error,
@@ -17,110 +17,24 @@ pub struct LogData {
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub async fn log_this(data: LogData) {
-    // Creates logs folder if it doesn't exist
-    if !std::path::Path::new("logs").exists() {
-        std::fs::create_dir("logs").unwrap();
+pub fn set_logging_path(mut path: String) {
+    if path[path.len() - 1..] != *"/" {
+        path.push('/');
     }
 
-    let file = OpenOptions::new().append(true).create(true).open(format!(
-        "logs/{}.log",
-        utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Date)
-    ));
-
-    match data.importance {
-        LogImportance::Error => {
-            file.unwrap()
-                .write_all(
-                    format!(
-                        "{} [ERROR] {}\n",
-                        utils::time_utils::get_formatted_time(
-                            utils::time_utils::TimeFormat::DateTime
-                        ),
-                        data.message
-                    )
-                    .as_bytes(),
-                )
-                .unwrap();
-            println!(
-                "{} {} {}",
-                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
-                "[ERROR]".fg::<Black>().bg::<Red>(),
-                data.message
-            );
-        }
-        LogImportance::Warning => {
-            file.unwrap()
-                .write_all(
-                    format!(
-                        "{} [WARNING] {}\n",
-                        utils::time_utils::get_formatted_time(
-                            utils::time_utils::TimeFormat::DateTime
-                        ),
-                        data.message
-                    )
-                    .as_bytes(),
-                )
-                .unwrap();
-            println!(
-                "{} {} {}",
-                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
-                "[WARNING]".fg::<Black>().bg::<Yellow>(),
-                data.message
-            );
-        }
-        LogImportance::Info => {
-            file.unwrap()
-                .write_all(
-                    format!(
-                        "{} [INFO] {}\n",
-                        utils::time_utils::get_formatted_time(
-                            utils::time_utils::TimeFormat::DateTime
-                        ),
-                        data.message
-                    )
-                    .as_bytes(),
-                )
-                .unwrap();
-            println!(
-                "{} {} {}",
-                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
-                "[INFO]".fg::<Black>().bg::<LightGray>(),
-                data.message
-            );
-        }
-        // Mainly unused, but still available
-        LogImportance::Debug => {
-            file.unwrap()
-                .write_all(
-                    format!(
-                        "{} [DEBUG] {}\n",
-                        utils::time_utils::get_formatted_time(
-                            utils::time_utils::TimeFormat::DateTime
-                        ),
-                        data.message
-                    )
-                    .as_bytes(),
-                )
-                .unwrap();
-            println!(
-                "{} {} {}",
-                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
-                "[DEBUG]".fg::<Black>().bg::<Magenta>(),
-                data.message
-            );
-        }
-    }
+    env::set_var("SCORCHED_LOG_PATH", path);
 }
 
-fn non_async_log_this(data: LogData) {
+/// Logs the given data to the console with the error type and then to a file
+fn log_this(data: LogData) {
     // Creates logs folder if it doesn't exist
     if !std::path::Path::new("logs").exists() {
         std::fs::create_dir("logs").unwrap();
     }
 
     let file = OpenOptions::new().append(true).create(true).open(format!(
-        "logs/{}.log",
+        "{}{}.log",
+        env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()),
         utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Date)
     ));
 
@@ -218,9 +132,9 @@ impl<T, E: Debug> LogExpect<T, E> for Result<T, E> {
         match self {
             Ok(val) => val,
             Err(err) => {
-                non_async_log_this(LogData {
+                log_this(LogData {
                     importance,
-                    message: format!("{}: {:?}", msg, err),
+                    message: msg.to_string(),
                 });
 
                 panic!("{}: {:?}", msg, err);
@@ -234,7 +148,7 @@ impl<T> LogExpect<T, ()> for Option<T> {
         match self {
             Some(val) => val,
             None => {
-                non_async_log_this(LogData {
+                log_this(LogData {
                     importance,
                     message: msg.to_string(),
                 });
@@ -242,16 +156,5 @@ impl<T> LogExpect<T, ()> for Option<T> {
                 panic!("{}", msg);
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn set_logging() {
-        crate::non_async_log_this(crate::LogData {
-            importance: crate::LogImportance::Info,
-            message: "Test".to_string(),
-        });
     }
 }
