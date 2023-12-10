@@ -26,7 +26,7 @@ pub fn set_logging_path(mut path: String) {
 }
 
 /// Logs the given data to the console with the error type and then to a file
-fn log_this(data: LogData) {
+pub fn log_this(data: LogData) {
     // Creates logs folder if it doesn't exist
     if !std::path::Path::new("logs").exists() {
         std::fs::create_dir("logs").unwrap();
