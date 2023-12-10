@@ -17,8 +17,9 @@ pub struct LogData {
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub fn set_logging_path(mut path: String) {
+pub fn set_logging_path(path: &str) {
     if path[path.len() - 1..] != *"/" {
+        let mut path = path.to_string();
         path.push('/');
     }
 
