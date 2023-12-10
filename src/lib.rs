@@ -1,7 +1,8 @@
 mod utils;
 
-use owo_colors::{colors::css::*, OwoColorize};
 use std::{env, fmt::Debug, fs::OpenOptions, io::prelude::*};
+
+use utils::{importance_tags::*, time_utils};
 
 pub enum LogImportance {
     Error,
@@ -15,8 +16,10 @@ pub struct LogData {
     pub message: String,
 }
 
+/// Scorched version, has no internal use
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+/// Changes environment variable for logging path
 pub fn set_logging_path(path: &str) {
     if path[path.len() - 1..] != *"/" {
         let mut path = path.to_string();
@@ -36,7 +39,7 @@ pub fn log_this(data: LogData) {
     let file = OpenOptions::new().append(true).create(true).open(format!(
         "{}{}.log",
         env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()),
-        utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Date)
+        time_utils::get_formatted_time(time_utils::TimeFormat::Date)
     ));
 
     match data.importance {
@@ -45,8 +48,8 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [ERROR] {}\n",
-                        utils::time_utils::get_formatted_time(
-                            utils::time_utils::TimeFormat::DateTime
+                        time_utils::get_formatted_time(
+                            time_utils::TimeFormat::DateTime
                         ),
                         data.message
                     )
@@ -55,8 +58,8 @@ pub fn log_this(data: LogData) {
                 .unwrap();
             println!(
                 "{} {} {}",
-                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
-                "[ERROR]".fg::<Black>().bg::<Red>(),
+                time_utils::get_formatted_time(time_utils::TimeFormat::Time),
+                error_tag(),
                 data.message
             );
         }
@@ -65,8 +68,8 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [WARNING] {}\n",
-                        utils::time_utils::get_formatted_time(
-                            utils::time_utils::TimeFormat::DateTime
+                        time_utils::get_formatted_time(
+                            time_utils::TimeFormat::DateTime
                         ),
                         data.message
                     )
@@ -75,8 +78,8 @@ pub fn log_this(data: LogData) {
                 .unwrap();
             println!(
                 "{} {} {}",
-                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
-                "[WARNING]".fg::<Black>().bg::<Yellow>(),
+                time_utils::get_formatted_time(time_utils::TimeFormat::Time),
+                warning_tag(),
                 data.message
             );
         }
@@ -85,8 +88,8 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [INFO] {}\n",
-                        utils::time_utils::get_formatted_time(
-                            utils::time_utils::TimeFormat::DateTime
+                        time_utils::get_formatted_time(
+                            time_utils::TimeFormat::DateTime
                         ),
                         data.message
                     )
@@ -95,8 +98,8 @@ pub fn log_this(data: LogData) {
                 .unwrap();
             println!(
                 "{} {} {}",
-                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
-                "[INFO]".fg::<Black>().bg::<LightGray>(),
+                time_utils::get_formatted_time(time_utils::TimeFormat::Time),
+                info_tag(),
                 data.message
             );
         }
@@ -106,8 +109,8 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [DEBUG] {}\n",
-                        utils::time_utils::get_formatted_time(
-                            utils::time_utils::TimeFormat::DateTime
+                        time_utils::get_formatted_time(
+                            time_utils::TimeFormat::DateTime
                         ),
                         data.message
                     )
@@ -116,8 +119,8 @@ pub fn log_this(data: LogData) {
                 .unwrap();
             println!(
                 "{} {} {}",
-                utils::time_utils::get_formatted_time(utils::time_utils::TimeFormat::Time),
-                "[DEBUG]".fg::<Black>().bg::<Magenta>(),
+                time_utils::get_formatted_time(time_utils::TimeFormat::Time),
+                debug_tag(),
                 data.message
             );
         }

@@ -10,7 +10,7 @@ pub enum TimeFormat {
 }
 
 /// Gets the current time in the specified format (DateTime, Date, or Time)
-pub fn get_formatted_time(time_format: TimeFormat) -> String {
+pub(crate) fn get_formatted_time(time_format: TimeFormat) -> String {
     let now = SystemTime::now();
     let since_the_epoch = now
         .duration_since(UNIX_EPOCH)
