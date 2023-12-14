@@ -1,3 +1,4 @@
+mod macros;
 mod utils;
 
 use std::{env, fmt::Debug, fs::OpenOptions, io::prelude::*};
@@ -29,11 +30,24 @@ pub fn set_logging_path(path: &str) {
     env::set_var("SCORCHED_LOG_PATH", path);
 }
 
+pub fn set_log_prefix(prefix: &str) {
+    env::set_var("SCORCHED_LOG_PREFIX", prefix);
+}
+
 /// Logs the given data to the console with the error type and then to a file
 pub fn log_this(data: LogData) {
     // Creates logs folder if it doesn't exist
-    if !std::path::Path::new(env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()).as_str()).exists() {
-        std::fs::create_dir_all(env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string())).log_expect(LogImportance::Error, "Failed to create logs folder");
+    if !std::path::Path::new(
+        env::var("SCORCHED_LOG_PATH")
+            .unwrap_or_else(|_| "logs/".to_string())
+            .as_str(),
+    )
+    .exists()
+    {
+        std::fs::create_dir_all(
+            env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()),
+        )
+        .log_expect(LogImportance::Error, "Failed to create logs folder");
     }
 
     let file = OpenOptions::new().append(true).create(true).open(format!(
@@ -42,16 +56,21 @@ pub fn log_this(data: LogData) {
         time_utils::get_formatted_time(time_utils::TimeFormat::Date)
     ));
 
+    let message = {
+        match env::var("SCORCHED_LOG_PREFIX") {
+            Ok(val) => format!("{} {}", val, data.message),
+            Err(_) => data.message,
+        }
+    };
+
     match data.importance {
         LogImportance::Error => {
             file.unwrap()
                 .write_all(
                     format!(
                         "{} [ERROR] {}\n",
-                        time_utils::get_formatted_time(
-                            time_utils::TimeFormat::DateTime
-                        ),
-                        data.message
+                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
+                        message
                     )
                     .as_bytes(),
                 )
@@ -60,7 +79,7 @@ pub fn log_this(data: LogData) {
                 "{} {} {}",
                 time_utils::get_formatted_time(time_utils::TimeFormat::Time),
                 error_tag(),
-                data.message
+                message
             );
         }
         LogImportance::Warning => {
@@ -68,10 +87,8 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [WARNING] {}\n",
-                        time_utils::get_formatted_time(
-                            time_utils::TimeFormat::DateTime
-                        ),
-                        data.message
+                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
+                        message
                     )
                     .as_bytes(),
                 )
@@ -80,7 +97,7 @@ pub fn log_this(data: LogData) {
                 "{} {} {}",
                 time_utils::get_formatted_time(time_utils::TimeFormat::Time),
                 warning_tag(),
-                data.message
+                message
             );
         }
         LogImportance::Info => {
@@ -88,10 +105,8 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [INFO] {}\n",
-                        time_utils::get_formatted_time(
-                            time_utils::TimeFormat::DateTime
-                        ),
-                        data.message
+                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
+                        message
                     )
                     .as_bytes(),
                 )
@@ -100,7 +115,7 @@ pub fn log_this(data: LogData) {
                 "{} {} {}",
                 time_utils::get_formatted_time(time_utils::TimeFormat::Time),
                 info_tag(),
-                data.message
+                message
             );
         }
         // Mainly unused, but still available
@@ -109,10 +124,8 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [DEBUG] {}\n",
-                        time_utils::get_formatted_time(
-                            time_utils::TimeFormat::DateTime
-                        ),
-                        data.message
+                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
+                        message
                     )
                     .as_bytes(),
                 )
@@ -121,7 +134,7 @@ pub fn log_this(data: LogData) {
                 "{} {} {}",
                 time_utils::get_formatted_time(time_utils::TimeFormat::Time),
                 debug_tag(),
-                data.message
+                message
             );
         }
     }
