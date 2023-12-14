@@ -4,13 +4,6 @@ on:
     paths:
       - 'Cargo.toml'
 
-  pull_request:
-    branches: [ "master" ]
-    paths:
-      - 'Cargo.toml'
-
-  workflow_dispatch:
-
 name: Publish
 
 jobs:
