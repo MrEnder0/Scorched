@@ -1,3 +1,4 @@
+mod macros;
 mod utils;
 
 use std::{env, fmt::Debug, fs::OpenOptions, io::prelude::*};
@@ -32,8 +33,17 @@ pub fn set_logging_path(path: &str) {
 /// Logs the given data to the console with the error type and then to a file
 pub fn log_this(data: LogData) {
     // Creates logs folder if it doesn't exist
-    if !std::path::Path::new(env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()).as_str()).exists() {
-        std::fs::create_dir_all(env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string())).log_expect(LogImportance::Error, "Failed to create logs folder");
+    if !std::path::Path::new(
+        env::var("SCORCHED_LOG_PATH")
+            .unwrap_or_else(|_| "logs/".to_string())
+            .as_str(),
+    )
+    .exists()
+    {
+        std::fs::create_dir_all(
+            env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()),
+        )
+        .log_expect(LogImportance::Error, "Failed to create logs folder");
     }
 
     let file = OpenOptions::new().append(true).create(true).open(format!(
@@ -48,9 +58,7 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [ERROR] {}\n",
-                        time_utils::get_formatted_time(
-                            time_utils::TimeFormat::DateTime
-                        ),
+                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
                         data.message
                     )
                     .as_bytes(),
@@ -68,9 +76,7 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [WARNING] {}\n",
-                        time_utils::get_formatted_time(
-                            time_utils::TimeFormat::DateTime
-                        ),
+                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
                         data.message
                     )
                     .as_bytes(),
@@ -88,9 +94,7 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [INFO] {}\n",
-                        time_utils::get_formatted_time(
-                            time_utils::TimeFormat::DateTime
-                        ),
+                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
                         data.message
                     )
                     .as_bytes(),
@@ -109,9 +113,7 @@ pub fn log_this(data: LogData) {
                 .write_all(
                     format!(
                         "{} [DEBUG] {}\n",
-                        time_utils::get_formatted_time(
-                            time_utils::TimeFormat::DateTime
-                        ),
+                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
                         data.message
                     )
                     .as_bytes(),
