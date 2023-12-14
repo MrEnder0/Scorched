@@ -2,9 +2,12 @@
 
 A simple logging library for scorching all those pesky bugs.
 
+> [!NOTE]
+> The current minimum supported Rust version is 1.60.0. (Last checked on 12/13/2023)
+
 ## Example
 
-This example shows how to use the library to log a message and check optional values.
+This example shows how to use `log_this` to log a message and check optional values.
 
 ```rust
 use scorched::*;
@@ -19,4 +22,22 @@ log_this(LogData {
     LogImportance::Debug,
     "All of the tests have now finished!"
 });
+```
+
+You can also use the `log_except` method on `Option` to log a message if the value is `None`.
+
+```rust
+use scorched::*;
+
+let bad_value = None::<i32>;
+
+bad_value.log_except(LogImportance::Error, "This should be logged");
+```
+
+> [!TIP]
+> If you like you could use the `logf!` macro to log a message with a format string.
+
+```rust
+let thread_id = "7"
+logf!(Info, "Heartbeat from thread {}.", thread_id);
 ```
