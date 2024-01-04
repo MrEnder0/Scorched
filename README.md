@@ -3,7 +3,7 @@
 A simple logging library for scorching all those pesky bugs.
 
 > [!NOTE]
-> The current minimum supported Rust version is 1.60.0. (Last checked on 12/13/2023)
+> The current minimum supported Rust version is: 1.60.0 (Last checked on 1/3/2023)
 
 ## Example
 
@@ -35,7 +35,7 @@ bad_value.log_except(LogImportance::Error, "This should be logged");
 ```
 
 > [!TIP]
-> If you like you could use the `logf!` macro to log a message with a format string.
+> If you like you can use the `logf!` macro to log a message and format a string without explicitly needing to run the format macro.
 
 ```rust
 let thread_id = "7"

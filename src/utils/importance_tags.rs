@@ -1,33 +1,22 @@
-use owo_colors::{
-    colors::{css::*, CustomColor},
-    ComboColorDisplay, OwoColorize,
-};
+/// This file contains the tags for the different levels of importance.
+/// These are pasted in front of the message when logging.
 
-pub(crate) fn error_tag(
-) -> ComboColorDisplay<'static, CustomColor<0, 0, 0>, CustomColor<{ u8::MAX }, 0, 0>, &'static str>
-{
-    "[ERROR]".fg::<Black>().bg::<Red>()
+/// Error tag displays red.
+pub(crate) const fn error_tag() -> &'static str {
+    "\x1b[31m[ERROR]\x1b[0m"
 }
 
-pub(crate) fn warning_tag() -> ComboColorDisplay<
-    'static,
-    CustomColor<0, 0, 0>,
-    CustomColor<{ u8::MAX }, { u8::MAX }, 0>,
-    &'static str,
-> {
-    "[WARNING]".fg::<Black>().bg::<Yellow>()
+/// Warning tag displays yellow.
+pub(crate) const fn warning_tag() -> &'static str {
+    "\x1b[33m[WARNING]\x1b[0m"
 }
 
-pub(crate) fn info_tag(
-) -> ComboColorDisplay<'static, CustomColor<0, 0, 0>, CustomColor<211, 211, 211>, &'static str> {
-    "[INFO]".fg::<Black>().bg::<LightGray>()
+/// Info tag displays light gray.
+pub(crate) const fn info_tag() -> &'static str {
+    "\x1b[37m[INFO]\x1b[0m"
 }
 
-pub(crate) fn debug_tag() -> ComboColorDisplay<
-    'static,
-    CustomColor<0, 0, 0>,
-    CustomColor<{ u8::MAX }, 0, { u8::MAX }>,
-    &'static str,
-> {
-    "[DEBUG]".fg::<Black>().bg::<Magenta>()
+/// Debug tag displays pink.
+pub(crate) const fn debug_tag() -> &'static str {
+    "\x1b[35m[DEBUG]\x1b[0m"
 }

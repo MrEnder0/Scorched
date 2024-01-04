@@ -1,6 +1,8 @@
 mod macros;
 mod utils;
 
+mod test;
+
 use std::{env, fmt::Debug, fs::OpenOptions, io::prelude::*};
 
 use utils::{importance_tags::*, time_utils};
