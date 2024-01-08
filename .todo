@@ -1,5 +1,5 @@
 [x] Remove owo collors dependency
 [ ] Make colors a feature flag
 [x] Create test cases
-[ ] Extend readme and documentation
-[ ] Create better rs doc comments
+[x] Extend readme and documentation
+[z] Create better rs doc comments

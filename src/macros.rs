@@ -1,3 +1,5 @@
+
+/// logf!() is a macro that allows you to log without needing to explicitly format the log message
 #[macro_export]
 macro_rules! logf {
     ($importance:ident, $($arg:tt)*) => {

@@ -3,7 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::{LogExpect, LogImportance};
 
-pub enum TimeFormat {
+pub(crate) enum TimeFormat {
     DateTime,
     Date,
     Time,

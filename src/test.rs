@@ -1,7 +1,7 @@
-use crate::{log_this, logf, LogData, LogImportance};
-
 #[test]
 fn test_log_this() {
+    use crate::{log_this, LogData, LogImportance};
+
     log_this(LogData {
         importance: LogImportance::Error,
         message: "Test error".to_string(),
@@ -25,6 +25,8 @@ fn test_log_this() {
 
 #[test]
 fn test_logf() {
+    use crate::{logf, LogData, LogImportance};
+
     logf!(Error, "Test error");
 
     logf!(Warning, "Test warning");
