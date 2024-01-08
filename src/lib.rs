@@ -7,6 +7,7 @@ use std::{env, fmt::Debug, fs::OpenOptions, io::prelude::*};
 
 use utils::{importance_tags::*, time_utils};
 
+/// Is given to the log functions to specify the importance of the log and is provided in the header of the log
 pub enum LogImportance {
     Error,
     Warning,
@@ -14,6 +15,7 @@ pub enum LogImportance {
     Debug,
 }
 
+/// Is given to the log functions to specify the log importance and the message of the log
 pub struct LogData {
     pub importance: LogImportance,
     pub message: String,
@@ -22,7 +24,7 @@ pub struct LogData {
 /// Scorched version, has no internal use
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-/// Changes environment variable for logging path
+/// Changes the environment variable for logging path
 pub fn set_logging_path(path: &str) {
     if path[path.len() - 1..] != *"/" {
         let mut path = path.to_string();
@@ -32,6 +34,7 @@ pub fn set_logging_path(path: &str) {
     env::set_var("SCORCHED_LOG_PATH", path);
 }
 
+/// Changes the environment variable for logging prefix, this is the text that is displayed before the log message
 pub fn set_log_prefix(prefix: &str) {
     env::set_var("SCORCHED_LOG_PREFIX", prefix);
 }
