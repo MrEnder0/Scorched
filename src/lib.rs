@@ -79,10 +79,10 @@ pub fn log_this(data: LogData) {
 
     fn write_log(importance: LogImportance, message: &str, file: &mut File) {
         let tag = match importance {
-            LogImportance::Error => (error_tag(), "ERROR"),
-            LogImportance::Warning => (warning_tag(), "WARNING"),
-            LogImportance::Info => (info_tag(), "INFO"),
-            LogImportance::Debug => (debug_tag(), "DEBUG"),
+            LogImportance::Error => (ERROR_TAG, "ERROR"),
+            LogImportance::Warning => (WARNING_TAG, "WARNING"),
+            LogImportance::Info => (INFO_TAG, "INFO"),
+            LogImportance::Debug => (DEBUG_TAG, "DEBUG"),
         };
 
         file.write_all(
