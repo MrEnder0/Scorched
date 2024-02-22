@@ -3,7 +3,12 @@ mod utils;
 
 mod test;
 
-use std::{env, fmt::Debug, fs::OpenOptions, io::prelude::*};
+use std::{
+    env,
+    fmt::Debug,
+    fs::{File, OpenOptions},
+    io::prelude::*,
+};
 
 use utils::{importance_tags::*, time_utils};
 
@@ -26,7 +31,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Changes the environment variable for logging path
 pub fn set_logging_path(path: &str) {
-    if path[path.len() - 1..] != *"/" {
+    if path[path.len() - 1..] != *"/" || path[path.len() - 1..] != *"\\" {
         let mut path = path.to_string();
         path.push('/');
     }
@@ -52,7 +57,10 @@ pub fn log_this(data: LogData) {
         std::fs::create_dir_all(
             env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()),
         )
-        .log_expect(LogImportance::Error, "Failed to create logs folder");
+        .log_expect(
+            LogImportance::Error,
+            "Failed to create full path to logs folder",
+        );
     }
 
     let file = OpenOptions::new().append(true).create(true).open(format!(
@@ -61,6 +69,7 @@ pub fn log_this(data: LogData) {
         time_utils::get_formatted_time(time_utils::TimeFormat::Date)
     ));
 
+    // Appends the prefix to the message if it exists
     let message = {
         match env::var("SCORCHED_LOG_PREFIX") {
             Ok(val) => format!("{} {}", val, data.message),
@@ -68,80 +77,38 @@ pub fn log_this(data: LogData) {
         }
     };
 
+    fn write_log(importance: LogImportance, message: &str, file: &mut File) {
+        let tag = match importance {
+            LogImportance::Error => (ERROR_TAG, "ERROR"),
+            LogImportance::Warning => (WARNING_TAG, "WARNING"),
+            LogImportance::Info => (INFO_TAG, "INFO"),
+            LogImportance::Debug => (DEBUG_TAG, "DEBUG"),
+        };
+
+        file.write_all(
+            format!(
+                "{} [{}] {}\n",
+                time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
+                tag.1,
+                message
+            )
+            .as_bytes(),
+        )
+        .unwrap();
+
+        println!(
+            "{} {} {}",
+            time_utils::get_formatted_time(time_utils::TimeFormat::Time),
+            tag.0,
+            message
+        );
+    }
+
     match data.importance {
-        LogImportance::Error => {
-            file.unwrap()
-                .write_all(
-                    format!(
-                        "{} [ERROR] {}\n",
-                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
-                        message
-                    )
-                    .as_bytes(),
-                )
-                .unwrap();
-            println!(
-                "{} {} {}",
-                time_utils::get_formatted_time(time_utils::TimeFormat::Time),
-                error_tag(),
-                message
-            );
-        }
-        LogImportance::Warning => {
-            file.unwrap()
-                .write_all(
-                    format!(
-                        "{} [WARNING] {}\n",
-                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
-                        message
-                    )
-                    .as_bytes(),
-                )
-                .unwrap();
-            println!(
-                "{} {} {}",
-                time_utils::get_formatted_time(time_utils::TimeFormat::Time),
-                warning_tag(),
-                message
-            );
-        }
-        LogImportance::Info => {
-            file.unwrap()
-                .write_all(
-                    format!(
-                        "{} [INFO] {}\n",
-                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
-                        message
-                    )
-                    .as_bytes(),
-                )
-                .unwrap();
-            println!(
-                "{} {} {}",
-                time_utils::get_formatted_time(time_utils::TimeFormat::Time),
-                info_tag(),
-                message
-            );
-        }
-        // Mainly unused, but still available
-        LogImportance::Debug => {
-            file.unwrap()
-                .write_all(
-                    format!(
-                        "{} [DEBUG] {}\n",
-                        time_utils::get_formatted_time(time_utils::TimeFormat::DateTime),
-                        message
-                    )
-                    .as_bytes(),
-                )
-                .unwrap();
-            println!(
-                "{} {} {}",
-                time_utils::get_formatted_time(time_utils::TimeFormat::Time),
-                debug_tag(),
-                message
-            );
-        }
+        LogImportance::Error => write_log(LogImportance::Error, &message, &mut file.unwrap()),
+        LogImportance::Warning => write_log(LogImportance::Warning, &message, &mut file.unwrap()),
+        LogImportance::Info => write_log(LogImportance::Info, &message, &mut file.unwrap()),
+        LogImportance::Debug => write_log(LogImportance::Debug, &message, &mut file.unwrap()),
     }
 }
 
