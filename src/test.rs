@@ -35,3 +35,17 @@ fn test_logf() {
 
     logf!(Debug, "Test debug");
 }
+
+#[test]
+fn test_log_path() {
+    use crate::*;
+
+    set_logging_path("logs/test");
+
+    log_this(LogData {
+        importance: LogImportance::Error,
+        message: "Test error".to_string(),
+    });
+
+    assert_eq!(*LOG_PATH.get().unwrap(), "logs/test/");
+}
