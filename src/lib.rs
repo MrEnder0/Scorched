@@ -4,10 +4,10 @@ mod utils;
 mod test;
 
 use std::{
-    env,
     fmt::Debug,
     fs::{File, OpenOptions},
     io::prelude::*,
+    sync::OnceLock,
 };
 
 use utils::{importance_tags::*, time_utils};
@@ -29,35 +29,39 @@ pub struct LogData {
 /// Scorched version, has no internal use
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+/// The crate statics for the logging path and prefix
+pub static LOG_PATH: OnceLock<&str> = OnceLock::new();
+pub static LOG_PREFIX: OnceLock<&str> = OnceLock::new();
+
 /// Changes the environment variable for logging path
 pub fn set_logging_path(path: &str) {
-    if path[path.len() - 1..] != *"/" || path[path.len() - 1..] != *"\\" {
+    let path = if path.ends_with('/') || path.ends_with('\\') {
+        path.to_string()
+    } else {
         let mut path = path.to_string();
         path.push('/');
-    }
+        path
+    };
 
-    env::set_var("SCORCHED_LOG_PATH", path);
+    match LOG_PATH.set(Box::leak(path.into_boxed_str())) {
+        Ok(_) => (),
+        Err(_) => panic!("Failed to set logging path"),
+    }
 }
 
 /// Changes the environment variable for logging prefix, this is the text that is displayed before the log message
-pub fn set_log_prefix(prefix: &str) {
-    env::set_var("SCORCHED_LOG_PREFIX", prefix);
+pub fn set_log_prefix(prefix: String) {
+    match LOG_PREFIX.set(Box::leak(prefix.into_boxed_str())) {
+        Ok(_) => (),
+        Err(_) => panic!("Failed to set logging prefix"),
+    }
 }
 
 /// Logs the given data to the console with the error type and then to a file
 pub fn log_this(data: LogData) {
     // Creates logs folder if it doesn't exist
-    if !std::path::Path::new(
-        env::var("SCORCHED_LOG_PATH")
-            .unwrap_or_else(|_| "logs/".to_string())
-            .as_str(),
-    )
-    .exists()
-    {
-        std::fs::create_dir_all(
-            env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()),
-        )
-        .log_expect(
+    if !std::path::Path::new(LOG_PATH.get().unwrap_or(&"logs/")).exists() {
+        std::fs::create_dir_all(LOG_PATH.get().unwrap_or(&"logs/")).log_expect(
             LogImportance::Error,
             "Failed to create full path to logs folder",
         );
@@ -65,15 +69,15 @@ pub fn log_this(data: LogData) {
 
     let file = OpenOptions::new().append(true).create(true).open(format!(
         "{}{}.log",
-        env::var("SCORCHED_LOG_PATH").unwrap_or_else(|_| "logs/".to_string()),
+        LOG_PATH.get().unwrap_or(&"logs/"),
         time_utils::get_formatted_time(time_utils::TimeFormat::Date)
     ));
 
     // Appends the prefix to the message if it exists
     let message = {
-        match env::var("SCORCHED_LOG_PREFIX") {
-            Ok(val) => format!("{} {}", val, data.message),
-            Err(_) => data.message,
+        match LOG_PREFIX.get() {
+            Some(val) => format!("{} {}", val, data.message),
+            None => data.message,
         }
     };
 
